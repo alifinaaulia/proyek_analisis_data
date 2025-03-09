@@ -173,7 +173,7 @@ unique_categories = top_product_per_state['product_cat'].unique()
 colormap = plt.cm.get_cmap('viridis', len(unique_categories)) 
 product_cat_colors = {cat: f'#{int(colormap(i)[0]*255):02x}{int(colormap(i)[1]*255):02x}{int(colormap(i)[2]*255):02x}' for i, cat in enumerate(unique_categories)}
 
-for feature in geojson_data['Feature']:
+for feature in geojson_data['features']:
     state_code = feature['properties']['sigla'] 
     top_product = top_product_per_state[top_product_per_state['geolocation_state'] == state_code]
     
