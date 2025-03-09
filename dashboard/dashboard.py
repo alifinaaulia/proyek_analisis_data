@@ -11,10 +11,10 @@ from shapely.geometry import shape
 
 # Load dataset 
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
+geojson_url = 'https://github.com/alifinaaulia/proyek_analisis_data/blob/main/dashboard/brazil_states.geojson'
 df = pd.read_csv(url)  
-geojson_file = 'brazil_state.geojson'
-with open(geojson_file, 'r') as file:
-    geojson_data = json.load(file)
+response = requests.get(geojson_url)
+geojson_data = response.json()
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
 df_city_revenue = df.groupby("customer_city").agg({
@@ -158,9 +158,6 @@ with st.expander('Klik untuk melihat Insight lebih lanjut'):
 st.subheader("Peta Produk Paling Populer di Setiap Negara Bagian")
 st.markdown("Peta ini menunjukkan produk dengan jumlah transaksi terbanyak di setiap negara bagian Brasil.")
 
-# Memuat data geojson untuk negara bagian Brasil
-with open('brazil_states.geojson', 'r') as file:
-    geojson_data = json.load(file)
 
 # Mengelompokkan Data Berdasarkan Negara Bagian dan Kategori Produk
 product_state_counts = df.groupby(['geolocation_state', 'product_cat'])['order_id'].nunique().reset_index(name='transaction_count')
