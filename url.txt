@@ -1,2 +1,2 @@
 Link Dashboard :
-https://dicoding-data-analysis-project.streamlit.app/
+https://ecommerce-analysis-project.streamlit.app/
