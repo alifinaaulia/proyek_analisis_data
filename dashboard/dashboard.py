@@ -181,7 +181,6 @@ try:
     response = requests.get(geojson_url)
     response.raise_for_status()  # Memeriksa apakah ada error saat mengunduh
     geojson_data = response.json()  # Mengonversi respons JSON ke objek Python
-    st.success("File GeoJSON berhasil diunduh dan dimuat!")
 except requests.exceptions.RequestException as e:
     st.error(f"Gagal mengunduh file GeoJSON: {e}")
     st.stop()
