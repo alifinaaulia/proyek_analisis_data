@@ -9,7 +9,7 @@ from folium.plugins import MarkerCluster
 from shapely.geometry import shape
 
 # Load dataset 
-df = pd.read_csv('main_data.csv')  
+df = pd.read_csv('./main_data.csv')  
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
 df_city_revenue = df.groupby("customer_city").agg({
