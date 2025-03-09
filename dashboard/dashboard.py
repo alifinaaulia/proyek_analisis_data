@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import folium
 import json
-import request
+import requests
 from streamlit_folium import folium_static
 from folium.plugins import MarkerCluster
 from shapely.geometry import shape
