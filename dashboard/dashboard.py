@@ -12,8 +12,7 @@ from shapely.geometry import shape
 # Load dataset 
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
 df = pd.read_csv(url)  
-geojson_url = 'https://github.com/alifinaaulia/proyek_analisis_data/blob/main/dashboard/brazil_states.geojson'
-geojson_data = pd.read_json(geojson_url)
+geojson_data = "brazil_states.geojson"
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
 df_city_revenue = df.groupby("customer_city").agg({
@@ -175,7 +174,7 @@ colormap = plt.cm.get_cmap('viridis', len(unique_categories))
 product_cat_colors = {cat: f'#{int(colormap(i)[0]*255):02x}{int(colormap(i)[1]*255):02x}{int(colormap(i)[2]*255):02x}' for i, cat in enumerate(unique_categories)}
 
 # Mencocokkan antara geojson_data dan produk dengan transaksi terbanyak di setiap negara bagian
-for feature in geojson_data[features]:
+for feature in geojson_data['Feature']:
     state_code = feature['properties']['sigla'] 
     top_product = top_product_per_state[top_product_per_state['geolocation_state'] == state_code]
     
