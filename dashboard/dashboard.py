@@ -29,11 +29,11 @@ top_city = df_city_revenue.loc[df_city_revenue["price"].idxmax(), "customer_city
 df_top_cities = df_city_revenue.sort_values(by="price", ascending=False).head(10)
 
 # Judul untuk dashboard Streamlit
-st.title("Dashboard Analisis Revenue dan Kategori Produk di E-Commerce Brazil")
+st.title("Dashboard Analisis Penjualan dan Kategori Produk Terjual di E-Commerce Brazil")
 
 # Menampilkan peta untuk total revenue per kota
-st.subheader("Peta Revenue per Kota")
-st.markdown("Peta ini menunjukkan total revenue untuk 10 kota dengan revenue tertinggi di Brazil dan menampilkan warna berdasarkan level revenue.")
+st.subheader("Peta Penjualan per Kota")
+st.markdown("Peta ini menunjukkan total penjualan untuk 10 kota dengan revenue tertinggi di Brazil dan menampilkan warna berdasarkan tingkat penjualannya.")
 m = folium.Map(location=[-14.2350, -51.9253], zoom_start=5)
 
 # Fungsi untuk menentukan warna berdasarkan level revenue
