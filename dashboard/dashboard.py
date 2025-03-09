@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import folium
-import json
 from streamlit_folium import folium_static
 from folium.plugins import MarkerCluster
 from shapely.geometry import shape
@@ -12,7 +11,7 @@ from shapely.geometry import shape
 # Load dataset 
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
 df = pd.read_csv(url)  
-geojson_data = 'brazil_states.geojson'
+geojson_data = "brazil_states.geojson"
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
 df_city_revenue = df.groupby("customer_city").agg({
