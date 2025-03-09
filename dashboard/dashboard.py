@@ -12,7 +12,8 @@ from shapely.geometry import shape
 # Load dataset 
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
 df = pd.read_csv(url)  
-geojson_data = "brazil_states.geojson"
+with open('brazil_states.geojson', 'r') as f:
+    geojson_data = json.load(f)
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
 df_city_revenue = df.groupby("customer_city").agg({
