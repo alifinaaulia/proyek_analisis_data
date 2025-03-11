@@ -14,11 +14,48 @@ from shapely.geometry import shape
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
 df = pd.read_csv(url)  
 
-# Tambahkan filter untuk memilih state
-selected_state = st.sidebar.selectbox("Pilih State", df["geolocation_state"].unique())
+# Dictionary mapping kode state ke nama panjang
+state_mapping = {
+    "AC": "AC (Acre)",
+    "AL": "AL (Alagoas)",
+    "AP": "AP (Amapá)",
+    "AM": "AM (Amazonas)",
+    "BA": "BA (Bahia)",
+    "CE": "CE (Ceará)",
+    "DF": "DF (Distrito Federal)",
+    "ES": "ES (Espírito Santo)",
+    "GO": "GO (Goiás)",
+    "MA": "MA (Maranhão)",
+    "MT": "MT (Mato Grosso)",
+    "MS": "MS (Mato Grosso do Sul)",
+    "MG": "MG (Minas Gerais)",
+    "PA": "PA (Pará)",
+    "PB": "PB (Paraíba)",
+    "PR": "PR (Paraná)",
+    "PE": "PE (Pernambuco)",
+    "PI": "PI (Piauí)",
+    "RJ": "RJ (Rio de Janeiro)",
+    "RN": "RN (Rio Grande do Norte)",
+    "RS": "RS (Rio Grande do Sul)",
+    "RO": "RO (Rondônia)",
+    "RR": "RR (Roraima)",
+    "SC": "SC (Santa Catarina)",
+    "SP": "SP (São Paulo)",
+    "SE": "SE (Sergipe)",
+    "TO": "TO (Tocantins)"
+}
 
-# Filter data berdasarkan state yang dipilih
-df_filtered = df[df["geolocation_state"] == selected_state]
+# Buat opsi dropdown dengan nama panjang state yang ada di dataset
+state_options = {state_mapping[k]: k for k in df["geolocation_state"].unique() if k in state_mapping}
+
+# Tambahkan filter untuk memilih state (nama panjang)
+selected_state_long = st.sidebar.selectbox("Pilih State", state_options.keys())
+
+# Dapatkan kode state yang sesuai dengan nama panjang
+selected_state_code = state_options[selected_state_long]
+
+# Filter data berdasarkan kode state yang dipilih
+df_filtered = df[df["geolocation_state"] == selected_state_code]
 
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
