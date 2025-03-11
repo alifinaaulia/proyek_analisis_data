@@ -14,6 +14,12 @@ from shapely.geometry import shape
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
 df = pd.read_csv(url)  
 
+# Tambahkan filter untuk memilih state
+selected_state = st.sidebar.selectbox("Pilih State", df["geolocation_state"].unique())
+
+# Filter data berdasarkan state yang dipilih
+df_filtered = df[df["geolocation_state"] == selected_state]
+
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
 df_city_revenue = df.groupby("customer_city").agg({
@@ -32,8 +38,8 @@ df_top_cities = df_city_revenue.sort_values(by="price", ascending=False).head(10
 st.title("Dashboard Analisis Penjualan dan Kategori Produk Terjual di E-Commerce Brazil")
 
 # Menampilkan peta untuk total revenue per kota
-st.subheader("Peta Penjualan per Kota")
-st.markdown("Peta ini menunjukkan total penjualan untuk 10 kota dengan revenue tertinggi di Brazil dan menampilkan warna berdasarkan tingkat penjualannya.")
+st.subheader(f"Peta Penjualan per Kota di {selected_state}")
+st.markdown("Peta ini menunjukkan total penjualan untuk 10 kota dengan revenue tertinggi di state yang dipilih.")
 m = folium.Map(location=[-14.2350, -51.9253], zoom_start=5)
 
 # Fungsi untuk menentukan warna berdasarkan level revenue
@@ -61,21 +67,17 @@ for _, row in df_top_cities.iterrows():
 folium_map = m
 folium_static(m)
 
-with st.expander('Klik untuk melihat Insight lebih lanjut'):
-    st.caption("""
-    **Insight:**
-            
-    Berdasarkan peta di atas, terlihat bahwa semakin hijau warna marker pada peta, semakin tinggi total pendapatan di kota tersebut.
-    Di antara 10 kota dengan total pendapatan tertinggi di Brasil, **Sao Paulo** memiliki total pendapatan tertinggi, yakni **BRL 1.914.600**. 
-    Hal ini mungkin disebabkan oleh fakta bahwa kota Sao Paulo merupakan kota terbesar di Brazil, yang berkontribusi pada tingginya total pendapatan.
-    """)
 
-st.write('Selanjutnya, akan dilihat performa penjualan pada kota Sao Paulo dari bulan ke bulan untuk menganalisis tren pertumbuhan penjualan (Month-over-Month) serta memahami pola peningkatan atau penurunan revenue di kota tersebut.')
-
-# Menyiapkan data untuk Pertumbuhan Bulan ke Bulan (MoM) untuk kota dengan revenue tertinggi
+# Menyiapkan data waktu
 df["order_purchase_timestamp"] = pd.to_datetime(df["order_purchase_timestamp"])
 df["year_month"] = df["order_purchase_timestamp"].dt.to_period("M")
-df_mom = df[(df["customer_city"] == top_city) & (df["order_purchase_timestamp"] < "2018-09-01")]
+
+# Menambahkan filter kota di sidebar
+city_options = df["customer_city"].unique()
+selected_city = st.sidebar.selectbox("Pilih Kota", city_options, index=0)
+
+# Menyiapkan data untuk MoM berdasarkan kota yang dipilih
+df_mom = df[(df["customer_city"] == selected_city) & (df["order_purchase_timestamp"] < "2018-09-01")]
 df_mom = df_mom.groupby("year_month")["price"].sum().reset_index()
 
 # Menghitung Pertumbuhan MoM
@@ -89,8 +91,8 @@ top_3_growth = df_mom_filtered.nlargest(3, "growth").index
 bottom_3_growth = df_mom_filtered.nsmallest(3, "growth").index 
 
 # Menampilkan grafik Pertumbuhan MoM
-st.subheader(f"Pertumbuhan Penjualan Bulanan (MoM) di {top_city}")
-st.markdown("Grafik ini menunjukkan pertumbuhan penjualan per bulan di kota dengan revenue tertinggi.")
+st.subheader(f"Pertumbuhan Penjualan Bulanan (MoM) di {selected_city}")
+st.markdown("Grafik ini menunjukkan pertumbuhan penjualan per bulan di kota yang dipilih.")
 fig = plt.figure(figsize=(12, 6))
 sns.lineplot(x="year_month", y="price", data=df_mom, marker="o", color="green")
 
@@ -106,32 +108,22 @@ for idx in bottom_3_growth:
              fontsize=12, ha="center", color="red", fontweight="bold")
 
 plt.xticks(rotation=45)
-plt.title(f"Pertumbuhan Penjualan MoM di {top_city}", fontsize=14)
+plt.title(f"Pertumbuhan Penjualan MoM di {selected_city}", fontsize=14)
 plt.xlabel("Bulan")
 plt.ylabel("Total Revenue (BRL)")
 
 # Menampilkan grafik di Streamlit
 st.pyplot(fig)
 
-with st.expander('Klik untuk melihat Insight lebih lanjut'):
-    st.caption("""
-    **Insight:**
-
-    Pada pertumbuhan penjualan bulanan (Month-over-Month) untuk kota Sao Paulo menunjukkan kenaikan tertinggi terjadi antara bulan Februari 2017 hingga Maret 2017 yakni sebesar 95,1%. Kenaikan penjualan bulanan pada bulan tersebut kemungkinan disebabkan oleh peningkatan permintaan musiman, perayaan hari besar, atau faktor eksternal seperti kebijakan pemerintah dan tren pasar yang sedang berlangsung.
-    Sebaliknya, penurunan terbesar bulanan di kota Sao Paulo yang terjadi di antara bulan November 2017 dan Desember 2017 yakni sebesar 28,3%.  Penurunan penjualan bulanan pada bulan-bulan tersebut kemungkinan disebabkan oleh berakhirnya periode promosi, penurunan permintaan musiman, atau faktor eksternal seperti kondisi ekonomi yang melemah dan perubahan regulasi.
-    """)
-
-st.write('Setelah didapatkan periode kenaikan penjualan tertinggi di kota Sao Paulo yakni pada Februari 2017 hingga Maret 2017, selanjutnya akan dianalisis mengenai kategori produk yang paling banyak dipesan pada periode tersebut untuk memahami tren permintaan dan faktor yang mungkin berkontribusi terhadap peningkatan penjualan.')
-
-# Menampilkan kategori produk terpopuler di Sao Paulo selama periode pertumbuhan tertinggi
-df_period = df[(df["customer_city"] == "sao paulo") & 
+# Menampilkan kategori produk terpopuler di kota yang dipilih selama periode pertumbuhan tertinggi
+df_period = df[(df["customer_city"] == selected_city) & 
                (df["order_purchase_timestamp"].between("2017-02-01", "2017-03-31"))]
 top_categories = df_period.groupby("product_cat")["order_id"].nunique().reset_index()
 top_categories = top_categories.sort_values(by="order_id", ascending=False)
 
 # Grafik kategori produk
-st.subheader(f"Kategori Produk Paling Banyak Dipesan di {top_city} (Feb-Mar 2017)")
-st.markdown("Grafik ini menunjukkan kategori produk yang paling banyak dipesan di Sao Paulo pada periode peningkatan tertinggi.")
+st.subheader(f"Kategori Produk Paling Banyak Dipesan di {selected_city} (Feb-Mar 2017)")
+st.markdown("Grafik ini menunjukkan kategori produk yang paling banyak dipesan di kota yang dipilih pada periode peningkatan tertinggi.")
 fig = plt.figure(figsize=(10, 5))
 ax = sns.barplot(x=top_categories["order_id"].head(10), 
                  y=top_categories["product_cat"].head(10))
@@ -144,14 +136,6 @@ for p in ax.patches:
 
 st.pyplot(fig)
 
-with st.expander('Klik untuk melihat Insight lebih lanjut'):
-    st.caption("""
-        **Insight:**
-
-        Berdasarkan chart di atas, terlihat bahwa produk dengan kategori Furniture Decor paling banyak dipesan pada periode tersebut dengan jumlah pesanannya mencapai 89. Kategori produk selanjutnya yang paling banyak dipesan yaitu Bed Bath Table sebanyak 59 pesanan, Sports Leisure sebanyak 49 pesanan, Health Beauty sebanyak 47 pesanan, dan Housewares sebanyak 40 pesanan.
-        Kategori produk yang paling banyak dipesan ini menunjukkan bahwa pada periode Februari 2017 hingga Maret 2017, terdapat peningkatan minat pelanggan terhadap produk-produk yang berkaitan dengan kebutuhan rumah tangga, kesehatan, serta aktivitas rekreasi.
-
-        """)
 
 # Menampilkan peta produk terpopuler per negara bagian di Brasil
 st.subheader("Peta Produk Paling Populer di Setiap Negara Bagian")
