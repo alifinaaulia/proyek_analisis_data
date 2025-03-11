@@ -97,9 +97,11 @@ sns.lineplot(x="year_month", y="price", data=df_mom, marker="o", color="green")
 
 # Menambahkan label untuk semua bulan
 for idx in range(len(df_mom_filtered)):
-    offset = 7000 if df_mom_filtered["growth"].iloc[idx] >= 0 else -7000  # Atur posisi label sesuai pertumbuhan positif/negatif
-    color = "blue" if df_mom_filtered["growth"].iloc[idx] >= 0 else "red"  # Warna biru untuk pertumbuhan positif, merah untuk negatif
-    plt.text(idx, df_mom_filtered["price"].iloc[idx] + offset, 
+    x_value = df_mom_filtered["year_month"].iloc[idx]  # Use actual x-axis value
+    offset = 7000 if df_mom_filtered["growth"].iloc[idx] >= 0 else -7000  
+    color = "blue" if df_mom_filtered["growth"].iloc[idx] >= 0 else "red"
+    
+    plt.text(x_value, df_mom_filtered["price"].iloc[idx] + offset, 
              f" {df_mom_filtered['growth'].iloc[idx]:.1f}%", 
              fontsize=10, ha="center", color=color, fontweight="bold")
 
