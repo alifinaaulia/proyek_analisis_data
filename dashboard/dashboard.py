@@ -45,21 +45,15 @@ state_mapping = {
     "TO": "TO (Tocantins)"
 }
 
-# Buat opsi dropdown dengan nama panjang state yang ada di dataset
-state_options = {state_mapping[k]: k for k in df["geolocation_state"].unique() if k in state_mapping}
-
-# Tambahkan filter untuk memilih state (nama panjang)
-selected_state_long = st.sidebar.selectbox("Pilih State", state_options.keys())
-
-# Dapatkan kode state yang sesuai dengan nama panjang
-selected_state_code = state_options[selected_state_long]
+# Buat opsi dropdown state yang ada di dataset
+selected_state = st.sidebar.selectbox("Pilih State", df["geolocation_state"].unique())
 
 # Filter data berdasarkan kode state yang dipilih
-df_filtered = df[df["geolocation_state"] == selected_state_code]
+df_filtered = df[df["geolocation_state"] == selected_state]
 
 
 # Mengelompokkan data berdasarkan kota dan menghitung total revenue per kota
-df_city_revenue = df.groupby("customer_city").agg({
+df_city_revenue = df_filtered.groupby("customer_city").agg({
     "price": "sum",  # Total revenue per kota
     "geolocation_lat": "first",  
     "geolocation_lng": "first"   
@@ -75,7 +69,7 @@ df_top_cities = df_city_revenue.sort_values(by="price", ascending=False).head(10
 st.title("Dashboard Analisis Penjualan dan Kategori Produk Terjual di E-Commerce Brazil")
 
 # Menampilkan peta untuk total revenue per kota
-st.subheader(f"Peta Penjualan per Kota di {selected_state_code}")
+st.subheader(f"Peta Penjualan per Kota di {selected_state}")
 st.markdown("Peta ini menunjukkan total penjualan untuk 10 kota dengan revenue tertinggi di state yang dipilih.")
 m = folium.Map(location=[-14.2350, -51.9253], zoom_start=5)
 
