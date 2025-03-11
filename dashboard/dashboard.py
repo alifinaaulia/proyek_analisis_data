@@ -115,14 +115,13 @@ st.pyplot(fig)
 
 
 # Menampilkan kategori produk terpopuler di kota yang dipilih selama periode pertumbuhan tertinggi
-df_period = df[(df["customer_city"] == selected_city) & 
-               (df["order_purchase_timestamp"].between("2017-02-01", "2017-03-31"))]
+df_period = df[(df["customer_city"] == selected_city)]
 top_categories = df_period.groupby("product_cat")["order_id"].nunique().reset_index()
 top_categories = top_categories.sort_values(by="order_id", ascending=False)
 
 # Grafik kategori produk
-st.subheader(f"Kategori Produk Paling Banyak Dipesan di {selected_city} (Feb-Mar 2017)")
-st.markdown("Grafik ini menunjukkan kategori produk yang paling banyak dipesan di kota yang dipilih pada periode peningkatan tertinggi.")
+st.subheader(f"Kategori Produk Paling Banyak Dipesan di {selected_city}")
+st.markdown("Grafik ini menunjukkan kategori produk yang paling banyak dipesan di kota yang dipilih.")
 fig = plt.figure(figsize=(10, 5))
 ax = sns.barplot(x=top_categories["order_id"].head(10), 
                  y=top_categories["product_cat"].head(10))
