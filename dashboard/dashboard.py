@@ -85,11 +85,9 @@ df_mom = df_mom.groupby("year_month")["price"].sum().reset_index()
 df_mom["growth"] = df_mom["price"].pct_change() * 100
 df_mom["year_month"] = df_mom["year_month"].astype(str)
 df_mom_cleaned = df_mom.dropna(subset=["growth"]).reset_index(drop=True)
-df_mom_filtered = df_mom_cleaned[df_mom_cleaned["price"].shift(1) > 0]
 
-# Mengambil 3 bulan dengan pertumbuhan tertinggi dan terendah
-top_3_growth = df_mom_filtered.nlargest(3, "growth").index  
-bottom_3_growth = df_mom_filtered.nsmallest(3, "growth").index 
+# Pastikan indeks tetap valid setelah filtering
+df_mom_filtered = df_mom_cleaned[df_mom_cleaned["price"].shift(1) > 0].reset_index(drop=True)
 
 # Menampilkan grafik Pertumbuhan MoM
 st.subheader(f"Pertumbuhan Penjualan Bulanan (MoM) di {selected_city}")
@@ -99,10 +97,10 @@ sns.lineplot(x="year_month", y="price", data=df_mom, marker="o", color="green")
 
 # Menambahkan label untuk semua bulan
 for idx in range(len(df_mom_filtered)):
-    offset = 7000 if df_mom_filtered["growth"][idx] >= 0 else -7000  # Atur posisi label sesuai pertumbuhan positif/negatif
-    color = "blue" if df_mom_filtered["growth"][idx] >= 0 else "red"  # Warna biru untuk pertumbuhan positif, merah untuk negatif
-    plt.text(idx, df_mom_filtered["price"][idx] + offset, 
-             f" {df_mom_filtered['growth'][idx]:.1f}%", 
+    offset = 7000 if df_mom_filtered["growth"].iloc[idx] >= 0 else -7000  # Atur posisi label sesuai pertumbuhan positif/negatif
+    color = "blue" if df_mom_filtered["growth"].iloc[idx] >= 0 else "red"  # Warna biru untuk pertumbuhan positif, merah untuk negatif
+    plt.text(idx, df_mom_filtered["price"].iloc[idx] + offset, 
+             f" {df_mom_filtered['growth'].iloc[idx]:.1f}%", 
              fontsize=10, ha="center", color=color, fontweight="bold")
 
 plt.xticks(rotation=45)
@@ -112,6 +110,7 @@ plt.ylabel("Total Revenue (BRL)")
 
 # Menampilkan grafik di Streamlit
 st.pyplot(fig)
+
 
 # Menampilkan kategori produk terpopuler di kota yang dipilih selama periode pertumbuhan tertinggi
 df_period = df[(df["customer_city"] == selected_city) & 
