@@ -14,36 +14,6 @@ from shapely.geometry import shape
 url = 'https://raw.githubusercontent.com/alifinaaulia/proyek_analisis_data/refs/heads/main/dashboard/main_data.csv'
 df = pd.read_csv(url)  
 
-# Dictionary mapping kode state ke nama panjang
-state_mapping = {
-    "AC": "AC (Acre)",
-    "AL": "AL (Alagoas)",
-    "AP": "AP (Amapá)",
-    "AM": "AM (Amazonas)",
-    "BA": "BA (Bahia)",
-    "CE": "CE (Ceará)",
-    "DF": "DF (Distrito Federal)",
-    "ES": "ES (Espírito Santo)",
-    "GO": "GO (Goiás)",
-    "MA": "MA (Maranhão)",
-    "MT": "MT (Mato Grosso)",
-    "MS": "MS (Mato Grosso do Sul)",
-    "MG": "MG (Minas Gerais)",
-    "PA": "PA (Pará)",
-    "PB": "PB (Paraíba)",
-    "PR": "PR (Paraná)",
-    "PE": "PE (Pernambuco)",
-    "PI": "PI (Piauí)",
-    "RJ": "RJ (Rio de Janeiro)",
-    "RN": "RN (Rio Grande do Norte)",
-    "RS": "RS (Rio Grande do Sul)",
-    "RO": "RO (Rondônia)",
-    "RR": "RR (Roraima)",
-    "SC": "SC (Santa Catarina)",
-    "SP": "SP (São Paulo)",
-    "SE": "SE (Sergipe)",
-    "TO": "TO (Tocantins)"
-}
 
 # Buat opsi dropdown state yang ada di dataset
 selected_state = st.sidebar.selectbox("Pilih State", df["geolocation_state"].unique())
@@ -104,7 +74,7 @@ df["order_purchase_timestamp"] = pd.to_datetime(df["order_purchase_timestamp"])
 df["year_month"] = df["order_purchase_timestamp"].dt.to_period("M")
 
 # Menambahkan filter kota di sidebar
-city_options = df["customer_city"].unique()
+city_options = df_filtered["customer_city"].unique()
 selected_city = st.sidebar.selectbox("Pilih Kota", city_options, index=0)
 
 # Menyiapkan data untuk MoM berdasarkan kota yang dipilih
@@ -127,16 +97,13 @@ st.markdown("Grafik ini menunjukkan pertumbuhan penjualan per bulan di kota yang
 fig = plt.figure(figsize=(12, 6))
 sns.lineplot(x="year_month", y="price", data=df_mom, marker="o", color="green")
 
-# Menyoroti 3 bulan dengan pertumbuhan tertinggi dan terendah
-for idx in top_3_growth:
-    plt.text(idx, df_mom_filtered["price"][idx] + 7000, 
+# Menambahkan label untuk semua bulan
+for idx in range(len(df_mom_filtered)):
+    offset = 7000 if df_mom_filtered["growth"][idx] >= 0 else -7000  # Atur posisi label sesuai pertumbuhan positif/negatif
+    color = "blue" if df_mom_filtered["growth"][idx] >= 0 else "red"  # Warna biru untuk pertumbuhan positif, merah untuk negatif
+    plt.text(idx, df_mom_filtered["price"][idx] + offset, 
              f" {df_mom_filtered['growth'][idx]:.1f}%", 
-             fontsize=12, ha="center", color="blue", fontweight="bold")
-
-for idx in bottom_3_growth:
-    plt.text(idx, df_mom_filtered["price"][idx] - 7000, 
-             f" {df_mom_filtered['growth'][idx]:.1f}%", 
-             fontsize=12, ha="center", color="red", fontweight="bold")
+             fontsize=10, ha="center", color=color, fontweight="bold")
 
 plt.xticks(rotation=45)
 plt.title(f"Pertumbuhan Penjualan MoM di {selected_city}", fontsize=14)
@@ -257,8 +224,3 @@ with st.expander('Klik untuk melihat Insight lebih lanjut'):
     Berdasarkan choropleth map diatas, produk dengan kategori Health Beauty merupakan produk paling populer di lebih dari 10 negara bagian. Kategori produk paling populer selanjutnya adalah Bed Bath Table yang populer di 5 negara bagian dan kategori produk Sport Leisure adalah kategori produk yang paling populer di 4 negara bagian.
     Tingginya jumlah pesanan/transaksi untuk kategori produk Health Beauty menunjukkan tren belanja yang cukup tinggi, terutama di wilayah dengan tingkat urbanisasi yang lebih besar, yang mungkin menunjukkan tingginya permintaan untuk produk perawatan pribadi. Sedangkan, untuk kategori produk Bed Bath Table mungkin cukup populer di 5 negara bagian karena adanya permintaan yang signifikan untuk produk rumah tangga dan perawatan rumah di wilayah-wilayah tersebut. Begitu juga untuk kategori produk Sports Leisure yang populer di 4 negara bagian menunjukkan minat yang tinggi terhadap aktivitas fisik dan hiburan luar ruangan di negara bagian tersebut.
     """)
-
-st.header("Kesimpulan:", divider='rainbow')
-st.markdown("1. Di antara 10 kota dengan total pendapatan tertinggi di Brazil, kota Sao Paulo memiliki total pendapatan tertinggi yakni BRL 1.914.600. Hal ini mungkin dikarenakan kota Sao Paulo juga memiliki jumlah pesanan yang tertinggi karena merupakan kota terbesar di Brazil sehingga membuat total pendapatannya juga tinggi.")
-st.markdown("2. Pada pertumbuhan penjualan bulanan (Month-over-Month) untuk kota Sao Paulo menunjukkan kenaikan tertinggi terjadi antara bulan Februari 2017 hingga Maret 2017 yakni sebesar 95,1%. Kenaikan penjualan bulanan pada bulan tersebut kemungkinan disebabkan oleh peningkatan permintaan musiman, perayaan hari besar, atau faktor eksternal seperti kebijakan pemerintah dan tren pasar yang sedang berlangsung. Sebaliknya, penurunan terbesar bulanan di kota Sao Paulo yang terjadi di antara bulan November 2017 dan Desember 2017 yakni sebesar 28,3%. Penurunan penjualan bulanan pada bulan-bulan tersebut kemungkinan disebabkan oleh berakhirnya periode promosi, penurunan permintaan musiman, atau faktor eksternal seperti kondisi ekonomi yang melemah dan perubahan regulasi.")
-st.markdown("3. Produk dengan kategori Furniture Decor paling banyak dipesan pada periode kenaikan tertinggi penjualan bulanan (Februari-Maret 2017) dengan jumlah pesanannya mencapai 89. Kategori produk selanjutnya yang paling banyak dipesan yaitu Bed Bath Table sebanyak 59 pesanan, Sports Leisure sebanyak 49 pesanan, Health Beauty sebanyak 47 pesanan, dan Housewares sebanyak 40 pesanan. Kategori produk yang paling banyak dipesan ini menunjukkan bahwa pada periode Februari 2017 hingga Maret 2017, terdapat peningkatan minat pelanggan terhadap produk-produk yang berkaitan dengan kebutuhan rumah tangga, kesehatan, serta aktivitas rekreasi. Oleh karena itu, diharapkan strategi pemasaran dapat lebih dioptimalkan seperti dengan meningkatkan promosi pada kategori produk yang sedang diminati/tren atau menawarkan bundling produk untuk meningkatkan penjualan lebih lanjut.")
