@@ -137,7 +137,7 @@ st.pyplot(fig)
 
 # Menampilkan peta produk terpopuler per negara bagian di Brasil
 st.subheader("Peta Produk Paling Populer di Setiap Negara Bagian")
-st.markdown("Peta ini menunjukkan produk dengan jumlah transaksi terbanyak di setiap negara bagian Brasil.")
+st.markdown("Peta ini menunjukkan produk dengan jumlah transaksi terbanyak di setiap negara bagian Brazil.")
 
 
 # Mengelompokkan Data Berdasarkan Negara Bagian dan Kategori Produk
