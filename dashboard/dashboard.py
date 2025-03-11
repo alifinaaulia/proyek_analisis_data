@@ -75,7 +75,7 @@ df_top_cities = df_city_revenue.sort_values(by="price", ascending=False).head(10
 st.title("Dashboard Analisis Penjualan dan Kategori Produk Terjual di E-Commerce Brazil")
 
 # Menampilkan peta untuk total revenue per kota
-st.subheader(f"Peta Penjualan per Kota di {selected_state}")
+st.subheader(f"Peta Penjualan per Kota di {selected_state_code}")
 st.markdown("Peta ini menunjukkan total penjualan untuk 10 kota dengan revenue tertinggi di state yang dipilih.")
 m = folium.Map(location=[-14.2350, -51.9253], zoom_start=5)
 
